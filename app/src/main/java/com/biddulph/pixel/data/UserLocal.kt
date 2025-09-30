@@ -5,5 +5,3 @@ package com.biddulph.pixel.data
  */
 data class UserLocal (val userId: Int, val followed: Boolean)
 // userId to link to UserRemote, followed for local followed state
-
-//TODO followed state

@@ -28,6 +28,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    //TODO empty list state - including error message
+    //TODO loading state
+    //TODO list state
+    //TODO toggle user follow
+    //TODO image loading from remote
 }
 
 @Composable
