@@ -1,18 +1,10 @@
 package com.biddulph.pixel.storage
 
 /**
- * Storage for the follower flag
+ * interface for the follower store - separated into interface to allow it to be mocked
  */
-class FollowerStorage {
+interface FollowerStorage {
 
-    //TODO datastore obj
-    
-    suspend fun getFollowedUserIds(): List<Int>{
-        //TODO return all user ids where followed = true
-        return ArrayList()
-    }
-
-    suspend fun toggleFollowedStateForUser(userId : Int){
-        //TODO if user exists, flip state, else add
-    }
+    suspend fun getFollowedUserIds(): List<Int>
+    suspend fun toggleFollowedStateForUser(userId: Int)
 }

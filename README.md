@@ -33,13 +33,21 @@ UserRemoteParser
 - empty list
 
 UserTest
-TODO
+
+- fields merged
+- follow state merged
+- negative follow state merged
 
 UserServiceImplTest
-TODO
+
+- data returned by fetch
+- data changed by toggle action
 
 FollowerStorageTest
-TODO
+
+- empty state
+- addition from toggle
+- removal from toggle
 
 
 
@@ -59,6 +67,7 @@ API and toggle to run off IO dispatcher.
 **FollowerStorage**
 
 Simple data store with user id vs toggle state (T/F). no entry = assumed false.
+Shared Prefs used to avoid needing DataStore library
 
 **Image Downloading**
 
@@ -67,6 +76,8 @@ async server request with local cache if time.
 **Testing**
 
 Focus on parsing of user data, merging of user object, service impl and storage of follower data
+
+Storage tests required robolectric to mock context.
 
 
 --------------------------------------

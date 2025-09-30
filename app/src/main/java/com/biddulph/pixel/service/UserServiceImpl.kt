@@ -1,31 +1,43 @@
 package com.biddulph.pixel.service
 
+import com.biddulph.pixel.request.StackOverflowCall
 import com.biddulph.pixel.data.User
-import com.biddulph.pixel.data.UserLocal
 import com.biddulph.pixel.data.UserRemote
+import com.biddulph.pixel.storage.FollowerStorage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * service to feed users into the view model
  */
-class UserServiceImpl : UserService {
+class UserServiceImpl(val remoteCall: StackOverflowCall, val localStorage: FollowerStorage) : UserService {
 
-    override suspend fun loadTopUsers(): Result<List<User>> {
-       //TODO get list of top 20 users from SO, merge with local storage of followed ids, return
-        return TODO("Provide the return value")
+    override suspend fun loadTopUsers(): Result<List<User>> = withContext(Dispatchers.IO) {
+
+        val apiCallResponse = remoteCall.fetchTopUsers()
+        val localFollowers = localStorage.getFollowedUserIds().toSet()
+
+        val users = apiCallResponse.items.map {
+            merge(it, localUser = localFollowers.contains(it.user_id))
+        }
+
+        Result.success(users)
     }
 
-    override suspend fun toggleFollow(userId: Int): Result<Unit> {
-        //TODO update the follow state for this user id in FollowerStorage
-        return TODO("Provide the return value")
+    override suspend fun toggleFollow(userId: Int): Result<Unit> = withContext(Dispatchers.IO) {
+        localStorage.toggleFollowedStateForUser(userId)
+        Result.success(Unit)
     }
 
-    fun merge(remoteUser: UserRemote, localUser: UserLocal?): User {
-        return User(
-            id = remoteUser.user_id,
-            name = remoteUser.display_name,
-            reputation = remoteUser.reputation,
-            profileImage = remoteUser.profile_image,
-            followed = localUser?.followed ?: false
-        )
+    internal companion object {
+        fun merge(remoteUser: UserRemote, localUser: Boolean): User {
+            return User(
+                id = remoteUser.user_id,
+                name = remoteUser.display_name,
+                reputation = remoteUser.reputation,
+                profileImage = remoteUser.profile_image,
+                followed = localUser
+            )
+        }
     }
 }
