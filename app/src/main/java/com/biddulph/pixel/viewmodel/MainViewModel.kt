@@ -26,9 +26,21 @@ class MainViewModel (private val userService: UserService): ViewModel() {
     }
 
     fun toggleFollow(userId: Int){
-        // request the service to flip the follow state between true/false
+        // request the service to flip the follow state between true/false in the storage
         viewModelScope.launch {
-            userService.toggleFollow(userId)
+            val result = userService.toggleFollow(userId)
+
+            if (result.isSuccess && state.value is MainViewState.Loaded){
+                // just update the chosen user state here - we know the flag is stored, so no full reload required
+                val updatedUsers = (state.value as MainViewState.Loaded).users.map {
+                    if (it.id == userId){
+                        it.copy(followed = !it.followed)
+                    }else{
+                        it
+                    }
+                }
+                mutableState.value = MainViewState.Loaded(updatedUsers)
+            }
         }
     }
 }

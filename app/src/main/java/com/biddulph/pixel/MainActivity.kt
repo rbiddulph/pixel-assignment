@@ -1,11 +1,10 @@
 package com.biddulph.pixel
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -26,18 +26,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.biddulph.pixel.data.User
-import com.biddulph.pixel.data.UserRemote
-import com.biddulph.pixel.data.UserRemoteResponse
-import com.biddulph.pixel.request.StackOverflowCall
 import com.biddulph.pixel.request.StackOverflowCallImpl
 import com.biddulph.pixel.service.UserService
 import com.biddulph.pixel.service.UserServiceImpl
-import com.biddulph.pixel.storage.FollowerStorage
 import com.biddulph.pixel.storage.FollowerStorageImpl
 import com.biddulph.pixel.ui.theme.PixelTheme
 import com.biddulph.pixel.viewmodel.MainViewModel
@@ -70,10 +69,12 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MainScreen(state, modifier = Modifier.padding(innerPadding),
                         onToggleFollowClick = {
-                            //TODO this will toggle user follow status and refresh (without data fetch)
+                            // this will toggle user follow status and refresh (without data fetch)
+                            viewModel.toggleFollow(it)
                         },
                         onRetryClick = {
-                            //TODO this will try to load user info again
+                            // this will try to load user info again
+                            viewModel.loadUsers()
                         })
                 }
             }
@@ -83,7 +84,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MainScreen(state: MainViewState, modifier: Modifier = Modifier, onToggleFollowClick: () -> Unit = {}, onRetryClick: () -> Unit = {}) {
+fun MainScreen(state: MainViewState, modifier: Modifier = Modifier, onToggleFollowClick: (Int) -> Unit = {}, onRetryClick: () -> Unit = {}) {
     when (state) {
         is MainViewState.Loading -> {
             LoadingScreen(modifier)
@@ -126,7 +127,7 @@ fun FailedScreen(errorMessage: String, modifier: Modifier = Modifier, onRetryCli
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(errorMessage)
+            Text(errorMessage)//TODO adjust alignment for multi-line
             Button(content = { Text("Retry") },
                 onClick = onRetryClick)
         }
@@ -137,7 +138,7 @@ fun FailedScreen(errorMessage: String, modifier: Modifier = Modifier, onRetryCli
 fun UserListScreen(
     users: List<User>,
     modifier: Modifier = Modifier,
-    onToggleFollowClick: () -> Unit) {
+    onToggleFollowClick: (Int) -> Unit) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -147,27 +148,38 @@ fun UserListScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ){
             items(users) { user ->
-                UserListItem(user)
+                UserListItem(user, onToggleFollowClick)
             }
         }
     }
 }
 
 @Composable
-fun UserListItem(user: User) {
+fun UserListItem(user: User, onToggleFollowClick: (Int) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(user.name)
-            user.profileImage?.let { Text(it) } //TODO profile image loading
-            if (user.followed) { //TODO toggle user follow state
-                Text("Followed")
-            } else {
-                Text("Unfollowed")
+        Row(modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically) {
+            //TODO an indicator that a user is followed
+            Image(painter = painterResource(id = R.drawable.profile_placeholder),//TODO we want to download from user.profileImage
+                contentDescription = user.name,
+                modifier = Modifier.requiredSize(48.dp))
+            Column(modifier = Modifier.padding(horizontal = 16.dp).weight(1f)) {
+                Text(text = user.name, //TODO Christian C. Salvadó character encoding
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp)
+                Text("${user.reputation}")
+                user.profileImage?.let { Text(it) } //TODO remove debug text
             }
-            Text("${user.reputation}")
+            if (user.followed) {
+                Button(content = { Text("Unfollow") },
+                    onClick = {onToggleFollowClick(user.id)})
+            } else {
+                Button(content = { Text("Follow") },
+                    onClick = {onToggleFollowClick(user.id)})
+            }
         }
     }
 }

@@ -19,11 +19,9 @@ This service is fed into MainViewModel which services the Compose UI view and ha
 
 The Compose UI has different states based on availability of data.
 
-
-TODO
 Users can tap a button to follow/unfollow a user in the UI - this changes the local storage state for that user.
-Profile images are downloaded from remote server and cached
 
+Profile images are downloaded from remote server and cached
 
 Tests
 -----
@@ -65,6 +63,7 @@ Technical Decisions
 
 Separate UserRemote vs UserLocal - distinction between data from API and from local storage.
 Merged into User obj for view model.
+Later on it has become more apparent that UserLocal is only being used by the tests, but it provides some separation of concerns, so will keep as-is.
 
 **UserService**
 
@@ -74,7 +73,11 @@ API and toggle to run off IO dispatcher.
 **FollowerStorage**
 
 Simple data store with user id vs toggle state (T/F). no entry = assumed false.
-Shared Prefs used to avoid needing DataStore library
+Shared Prefs used to avoid needing DataStore library. StringSet to keep a list of id's - preferred to option of using key as user id.
+
+**StackOverflowCall**
+
+Initially just building to recognise 200 response as OK and others as failure to keep things simple.
 
 **Image Downloading**
 
@@ -88,11 +91,12 @@ Storage tests required robolectric to mock context. State tests required dispatc
 
 **View Model**
 
-simple state engine with 3 states: Loading, Loaded, Failed
+Simple state engine with 3 states: Loading, Loaded, Failed
 
 **State**
 
-state holds the user list for the Loaded state and failure message for the Failed state. 
+State holds the user list for the Loaded state and failure message for the Failed state. 
+Toggle follow/unfollow updates the view model data directly rather than re-querying as we're only using a local storage for the flag, not unreliable.
 
 
 --------------------------------------

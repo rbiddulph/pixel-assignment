@@ -6,9 +6,7 @@ import com.biddulph.pixel.data.UserRemote
 import com.biddulph.pixel.storage.FollowerStorage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 /**
  * service to feed users into the view model
