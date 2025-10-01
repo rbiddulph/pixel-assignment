@@ -21,6 +21,7 @@ class UserServiceImpl(val remoteCall: StackOverflowCall, val localStorage: Follo
             merge(it, localUser = localFollowers.contains(it.user_id))
         }
 
+        //TODO empty list is a failure
         Result.success(users)
     }
 
