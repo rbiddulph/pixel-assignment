@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -110,10 +112,14 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             CircularProgressIndicator()
-            Text("Loading...")
+            Text("Loading...",
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }
@@ -125,9 +131,13 @@ fun FailedScreen(errorMessage: String, modifier: Modifier = Modifier, onRetryCli
         contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(errorMessage)//TODO adjust alignment for multi-line
+            Text(text = errorMessage,
+                textAlign = TextAlign.Center,
+            )
             Button(content = { Text("Retry") },
                 onClick = onRetryClick)
         }
@@ -160,26 +170,35 @@ fun UserListItem(user: User, onToggleFollowClick: (Int) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Row(modifier = Modifier.padding(16.dp).fillMaxWidth(),
+        Row(modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically) {
-            //TODO an indicator that a user is followed
-            Image(painter = painterResource(id = R.drawable.profile_placeholder),//TODO we want to download from user.profileImage
-                contentDescription = user.name,
-                modifier = Modifier.requiredSize(48.dp))
-            Column(modifier = Modifier.padding(horizontal = 16.dp).weight(1f)) {
+            Box(modifier = Modifier.requiredSize(64.dp)) {
+                Image(painter = painterResource(id = R.drawable.profile_placeholder),//TODO we want to download from user.profileImage
+                    contentDescription = user.name,
+                    modifier = Modifier
+                        .requiredSize(40.dp)
+                        .align(Alignment.Center))
+                if (user.followed) { // indicate that the user is followed with an icon
+                    Image(painter = painterResource(id = R.drawable.user_followed),
+                        contentDescription = "${user.name} is followed",
+                        modifier = Modifier
+                            .size(24.dp)
+                            .align(Alignment.TopEnd))
+                }
+            }
+            Column(modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .weight(1f)) {
                 Text(text = user.name, //TODO Christian C. Salvadó character encoding
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp)
                 Text("${user.reputation}")
-                user.profileImage?.let { Text(it) } //TODO remove debug text
             }
-            if (user.followed) {
-                Button(content = { Text("Unfollow") },
-                    onClick = {onToggleFollowClick(user.id)})
-            } else {
-                Button(content = { Text("Follow") },
-                    onClick = {onToggleFollowClick(user.id)})
-            }
+            val followedText = if (user.followed) "Unfollow" else "Follow"
+            Button(content = { Text(followedText) },
+                onClick = { onToggleFollowClick(user.id) })
         }
     }
 }
@@ -209,6 +228,6 @@ fun UserListPreviewLoaded() {
 @Composable
 fun UserListPreviewFailed() {
     PixelTheme {
-        MainScreen(MainViewState.Failed("Preview Error"))
+        MainScreen(MainViewState.Failed("Preview Error: This is an error that uses two lines on a small screen device"))
     }
 }
