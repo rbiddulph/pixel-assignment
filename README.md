@@ -54,6 +54,9 @@ FollowerStorageTest
 MainViewModelTest
 
 - state begins as Loading
+- state is Loaded after loading user data
+- state is Failed after loading empty user data
+
 
 Technical Decisions
 -------------------
@@ -81,11 +84,15 @@ async server request with local cache if time.
 
 Focus on parsing of user data, merging of user object, service impl and storage of follower data
 
-Storage tests required robolectric to mock context.
+Storage tests required robolectric to mock context. State tests required dispatcher to be available in UserServiceImpl
 
 **View Model**
 
 simple state engine with 3 states: Loading, Loaded, Failed
+
+**State**
+
+state holds the user list for the Loaded state and failure message for the Failed state. 
 
 
 --------------------------------------

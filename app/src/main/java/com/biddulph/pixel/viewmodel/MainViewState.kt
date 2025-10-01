@@ -1,8 +1,10 @@
 package com.biddulph.pixel.viewmodel
 
+import com.biddulph.pixel.data.User
+
 sealed class MainViewState {
     object Loading : MainViewState()
-    object Loaded : MainViewState()
+    data class Loaded(val users: List<User>) : MainViewState()
     // failed represents IO issues or zero users
-    object Failed : MainViewState()
+    data class Failed(val error: String) : MainViewState()
 }

@@ -18,9 +18,9 @@ class MainViewModel (private val userService: UserService): ViewModel() {
         viewModelScope.launch {
             val response = userService.loadTopUsers()
             if (response.isSuccess){
-                mutableState.value = MainViewState.Loaded
+                mutableState.value = MainViewState.Loaded(response.getOrThrow())
             }else{
-                mutableState.value = MainViewState.Failed
+                mutableState.value = MainViewState.Failed(response.exceptionOrNull()?.message ?: "Null error")
             }
         }
     }

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.biddulph.pixel.data.User
 import com.biddulph.pixel.data.UserRemote
 import com.biddulph.pixel.data.UserRemoteResponse
 import com.biddulph.pixel.request.StackOverflowCall
@@ -107,12 +110,12 @@ fun MainScreen(state: MainViewState, modifier: Modifier = Modifier, onToggleFoll
         }
 
         is MainViewState.Loaded -> {
-            UserListScreen(modifier, onToggleFollowClick)
+            UserListScreen(state.users, modifier, onToggleFollowClick)
 
         }
 
         is MainViewState.Failed -> {
-            FailedScreen(modifier, onRetryClick)
+            FailedScreen(state.error, modifier, onRetryClick)
         }
     }
 
@@ -134,7 +137,7 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FailedScreen(modifier: Modifier = Modifier, onRetryClick : ()->Unit) {
+fun FailedScreen(errorMessage: String, modifier: Modifier = Modifier, onRetryClick: () -> Unit) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -142,7 +145,7 @@ fun FailedScreen(modifier: Modifier = Modifier, onRetryClick : ()->Unit) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Failed") //TODO error message
+            Text(errorMessage)
             Button(content = { Text("Retry") },
                 onClick = onRetryClick)
         }
@@ -150,17 +153,25 @@ fun FailedScreen(modifier: Modifier = Modifier, onRetryClick : ()->Unit) {
 }
 
 @Composable
-fun UserListScreen(modifier: Modifier = Modifier, onToggleFollowClick : ()->Unit) {
+fun UserListScreen(
+    users: List<User>,
+    modifier: Modifier = Modifier,
+    onToggleFollowClick: () -> Unit) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("User List")
+        LazyColumn {
+            items(users) { user ->
+                UserListItem(user)
+            }
         }
     }
+}
+
+@Composable
+fun UserListItem(user: User) {
+    Text(user.name)//TODO build out user info
 }
 
 @Preview(showBackground = true, name = "Loading State")
@@ -175,7 +186,12 @@ fun UserListPreviewLoading() {
 @Composable
 fun UserListPreviewLoaded() {
     PixelTheme {
-        MainScreen(MainViewState.Loaded)
+        val previewUsers = listOf(
+            User(1, "Alice", 100, "https://", false),
+            User(2, "Bob", 200, "https://", true),
+            User(3, "Chad", 300, "https://", false),
+        )
+        MainScreen(MainViewState.Loaded(users = previewUsers))
     }
 }
 
@@ -183,6 +199,6 @@ fun UserListPreviewLoaded() {
 @Composable
 fun UserListPreviewFailed() {
     PixelTheme {
-        MainScreen(MainViewState.Failed)
+        MainScreen(MainViewState.Failed("Preview Error"))
     }
 }
