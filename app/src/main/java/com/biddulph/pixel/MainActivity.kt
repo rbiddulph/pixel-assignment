@@ -153,10 +153,11 @@ fun UserListScreen(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        LazyColumn (
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
-        ){
+        ) {
             items(users) { user ->
                 UserListItem(user, onToggleFollowClick)
             }
@@ -200,6 +201,30 @@ fun UserListItem(user: User, onToggleFollowClick: (Int) -> Unit) {
             Button(content = { Text(followedText) },
                 onClick = { onToggleFollowClick(user.id) })
         }
+    }
+}
+
+@Preview(showBackground = true, name = "User List Item Unfollowed")
+@Composable
+fun UserListItemPreviewFollowed() {
+    PixelTheme {
+        UserListItem (User(1, "Alice", 100, "https://", false), {})
+    }
+}
+
+@Preview(showBackground = true, name = "User List Item Followed")
+@Composable
+fun UserListItemPreviewUnfollowed() {
+    PixelTheme {
+        UserListItem (User(1, "Alice", 100, "https://", true), {})
+    }
+}
+
+@Preview(showBackground = true, name = "User List Item Edge Cases")
+@Composable
+fun UserListItemPreviewEdgeCases() {
+    PixelTheme {
+        UserListItem (User(1, "Alice with a very long surname", 1000000000, "https://", true), {})
     }
 }
 
