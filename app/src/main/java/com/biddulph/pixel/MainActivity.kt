@@ -191,7 +191,7 @@ fun UserListItem(user: User, onToggleFollowClick: (Int) -> Unit) {
             Column(modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .weight(1f)) {
-                Text(text = user.name, //TODO Christian C. Salvadó character encoding
+                Text(text = user.name,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp)
                 Text("${user.reputation}")
