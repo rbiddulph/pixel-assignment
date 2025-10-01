@@ -15,10 +15,12 @@ Functionality
 
 The app uses a service to combine user data from 2 sources - remote StackOverlow API and local storage
 
+This service is fed into MainViewModel which services the Compose UI view and handles state.
+
+The Compose UI has different states based on availability of data.
 
 
 TODO
-This user data is held in a view model which is referenced by the compose UI
 Users can tap a button to follow/unfollow a user in the UI - this changes the local storage state for that user.
 Profile images are downloaded from remote server and cached
 
@@ -49,7 +51,9 @@ FollowerStorageTest
 - addition from toggle
 - removal from toggle
 
+MainViewModelTest
 
+- state begins as Loading
 
 Technical Decisions
 -------------------
@@ -78,6 +82,10 @@ async server request with local cache if time.
 Focus on parsing of user data, merging of user object, service impl and storage of follower data
 
 Storage tests required robolectric to mock context.
+
+**View Model**
+
+simple state engine with 3 states: Loading, Loaded, Failed
 
 
 --------------------------------------
