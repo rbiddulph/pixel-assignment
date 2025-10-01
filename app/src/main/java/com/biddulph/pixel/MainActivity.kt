@@ -34,9 +34,11 @@ import com.biddulph.pixel.data.User
 import com.biddulph.pixel.data.UserRemote
 import com.biddulph.pixel.data.UserRemoteResponse
 import com.biddulph.pixel.request.StackOverflowCall
+import com.biddulph.pixel.request.StackOverflowCallImpl
 import com.biddulph.pixel.service.UserService
 import com.biddulph.pixel.service.UserServiceImpl
 import com.biddulph.pixel.storage.FollowerStorage
+import com.biddulph.pixel.storage.FollowerStorageImpl
 import com.biddulph.pixel.ui.theme.PixelTheme
 import com.biddulph.pixel.viewmodel.MainViewModel
 import com.biddulph.pixel.viewmodel.MainViewModelFactory
@@ -44,40 +46,15 @@ import com.biddulph.pixel.viewmodel.MainViewState
 
 class MainActivity : ComponentActivity() {
 
-    //TODO move to real API
-    class FakeCall : StackOverflowCall {
-        override suspend fun fetchTopUsers(): UserRemoteResponse {
-            val listOfUsers = listOf<UserRemote>(
-                UserRemote(user_id = 1, display_name = "A", reputation = 100, profile_image = "https://..."),
-                UserRemote(user_id = 2, display_name = "B", reputation = 200, profile_image = "https://...")
-            )
-            return UserRemoteResponse(listOfUsers)
-        }
-    }
-
-    //TODO move to real store
-    class FakeStore : FollowerStorage {
-
-        private val store = emptySet<Int>().toMutableSet()
-        override suspend fun getFollowedUserIds(): List<Int> {
-            return store.toList()
-        }
-
-        override suspend fun toggleFollowedStateForUser(userId: Int) {
-            if (store.contains(userId)) {
-                store.remove(userId)
-            } else {
-                store.add(userId)
-            }
-        }
-    }
-
-    private val service: UserService by lazy {
-        UserServiceImpl(remoteCall = FakeCall(), localStorage = FakeStore())//TODO replace fakes
-    }
+    private lateinit var service: UserService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // stack overflow call
+        val apiRequest = StackOverflowCallImpl()
+        val storage = FollowerStorageImpl(applicationContext)
+        service = UserServiceImpl(remoteCall = apiRequest, localStorage = storage)
 
         val viewModel: MainViewModel = ViewModelProvider(this, MainViewModelFactory(service))[MainViewModel::class.java]
 

@@ -1,5 +1,6 @@
 package com.biddulph.pixel.data
 
+import com.biddulph.pixel.parser.UserJsonParser
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -41,21 +42,6 @@ class UserRemoteParserTest {
         val jsonString = requireNotNull(javaClass.getResource(filename)) {
             "File not found"
         }.readText()
-
-        val jsonObject = JSONObject(jsonString)
-        val items = jsonObject.getJSONArray("items")
-
-        val parsedUsers = (0 until items.length()).map { index ->
-            val item = items.getJSONObject(index)
-
-            UserRemote(
-                user_id = item.getInt("user_id"),
-                display_name = item.getString("display_name"),
-                reputation = item.getInt("reputation"),
-                profile_image = item.optString("profile_image").ifEmpty { null }
-            )
-        }
-
-        return UserRemoteResponse(items = parsedUsers)
+        return UserJsonParser.parse(jsonString)
     }
 }

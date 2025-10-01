@@ -18,19 +18,18 @@ class UserServiceImpl(val remoteCall: StackOverflowCall,
                       val dispatcher: CoroutineDispatcher = Dispatchers.IO) : UserService {
 
     override suspend fun loadTopUsers(): Result<List<User>> = withContext(dispatcher) {
+        runCatching {
+            val apiCallResponse = remoteCall.fetchTopUsers()
+            val localFollowers = localStorage.getFollowedUserIds().toSet()
 
-        val apiCallResponse = remoteCall.fetchTopUsers()
-        val localFollowers = localStorage.getFollowedUserIds().toSet()
+            val users = apiCallResponse.items.map {
+                merge(it, localUser = localFollowers.contains(it.user_id))
+            }
 
-        val users = apiCallResponse.items.map {
-            merge(it, localUser = localFollowers.contains(it.user_id))
-        }
-
-        // an empty list of users will be a failure to switch us to the failure retry state
-        if (users.isEmpty()){
-            Result.failure(Exception("No users found"))
-        }else {
-            Result.success(users)
+            if (users.isEmpty()){
+                throw RuntimeException("no users found")
+            }
+            users
         }
     }
 
