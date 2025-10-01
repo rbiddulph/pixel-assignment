@@ -13,7 +13,7 @@ class MainViewModel (private val userService: UserService): ViewModel() {
     val state : StateFlow<MainViewState> = mutableState
 
     fun loadUsers(){
-        //TODO load via service, set state
+        // ensure we're in the loading state and request the latest users
         mutableState.value = MainViewState.Loading
         viewModelScope.launch {
             val response = userService.loadTopUsers()
@@ -26,7 +26,7 @@ class MainViewModel (private val userService: UserService): ViewModel() {
     }
 
     fun toggleFollow(userId: Int){
-        //TODO toggle via service, set state
+        // request the service to flip the follow state between true/false
         viewModelScope.launch {
             userService.toggleFollow(userId)
         }

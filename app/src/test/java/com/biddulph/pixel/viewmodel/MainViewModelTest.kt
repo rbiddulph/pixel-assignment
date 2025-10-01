@@ -5,11 +5,15 @@ import com.biddulph.pixel.data.UserRemoteResponse
 import com.biddulph.pixel.request.StackOverflowCall
 import com.biddulph.pixel.service.UserServiceImpl
 import com.biddulph.pixel.storage.FollowerStorage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -48,10 +52,16 @@ class MainViewModelTest {
         }
     }
 
+    val testDispatcher = StandardTestDispatcher()
+
+    @Before
+    fun setUpDispatcher(){
+        Dispatchers.setMain(testDispatcher)
+    }
 
     @Test
     fun `check state launches as loading`() = runTest {
-        val service = UserServiceImpl(remoteCall = FakeCallSuccess(), localStorage = FakeStore())
+        val service = UserServiceImpl(remoteCall = FakeCallSuccess(), localStorage = FakeStore(), dispatcher = testDispatcher)
         val viewModel = MainViewModel(userService = service)
         assertTrue(viewModel.state.value is MainViewState.Loading)
 
@@ -59,7 +69,7 @@ class MainViewModelTest {
 
     @Test
     fun `check state success once data loaded`() = runTest {
-        val service = UserServiceImpl(remoteCall = FakeCallSuccess(), localStorage = FakeStore())
+        val service = UserServiceImpl(remoteCall = FakeCallSuccess(), localStorage = FakeStore(), dispatcher = testDispatcher)
         val viewModel = MainViewModel(userService = service)
         viewModel.loadUsers()
         advanceUntilIdle()
@@ -68,7 +78,7 @@ class MainViewModelTest {
 
     @Test
     fun `check state failed once data load failed`() = runTest {
-        val service = UserServiceImpl(remoteCall = FakeCallFailure(), localStorage = FakeStore())
+        val service = UserServiceImpl(remoteCall = FakeCallFailure(), localStorage = FakeStore(), dispatcher = testDispatcher)
         val viewModel = MainViewModel(userService = service)
         viewModel.loadUsers()
         advanceUntilIdle()

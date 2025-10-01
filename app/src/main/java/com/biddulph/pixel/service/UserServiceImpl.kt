@@ -4,15 +4,20 @@ import com.biddulph.pixel.request.StackOverflowCall
 import com.biddulph.pixel.data.User
 import com.biddulph.pixel.data.UserRemote
 import com.biddulph.pixel.storage.FollowerStorage
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 /**
  * service to feed users into the view model
  */
-class UserServiceImpl(val remoteCall: StackOverflowCall, val localStorage: FollowerStorage) : UserService {
+class UserServiceImpl(val remoteCall: StackOverflowCall,
+                      val localStorage: FollowerStorage,
+                      val dispatcher: CoroutineDispatcher = Dispatchers.IO) : UserService {
 
-    override suspend fun loadTopUsers(): Result<List<User>> = withContext(Dispatchers.IO) {
+    override suspend fun loadTopUsers(): Result<List<User>> = withContext(dispatcher) {
 
         val apiCallResponse = remoteCall.fetchTopUsers()
         val localFollowers = localStorage.getFollowedUserIds().toSet()
@@ -21,11 +26,15 @@ class UserServiceImpl(val remoteCall: StackOverflowCall, val localStorage: Follo
             merge(it, localUser = localFollowers.contains(it.user_id))
         }
 
-        //TODO empty list is a failure
-        Result.success(users)
+        // an empty list of users will be a failure to switch us to the failure retry state
+        if (users.isEmpty()){
+            Result.failure(Exception("No users found"))
+        }else {
+            Result.success(users)
+        }
     }
 
-    override suspend fun toggleFollow(userId: Int): Result<Unit> = withContext(Dispatchers.IO) {
+    override suspend fun toggleFollow(userId: Int): Result<Unit> = withContext(dispatcher) {
         localStorage.toggleFollowedStateForUser(userId)
         Result.success(Unit)
     }
