@@ -4,48 +4,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.biddulph.pixel.data.User
 import com.biddulph.pixel.request.StackOverflowCallImpl
 import com.biddulph.pixel.service.UserService
 import com.biddulph.pixel.service.UserServiceImpl
 import com.biddulph.pixel.storage.FollowerStorageImpl
+import com.biddulph.pixel.ui.screen.MainScreen
 import com.biddulph.pixel.ui.theme.PixelTheme
-import com.biddulph.pixel.view.ProfileImage
 import com.biddulph.pixel.viewmodel.MainViewModel
 import com.biddulph.pixel.viewmodel.MainViewModelFactory
-import com.biddulph.pixel.viewmodel.MainViewState
 
 class MainActivity : ComponentActivity() {
 
@@ -83,184 +56,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-
-@Composable
-fun MainScreen(state: MainViewState, modifier: Modifier = Modifier, onToggleFollowClick: (Int) -> Unit = {}, onRetryClick: () -> Unit = {}) {
-    when (state) {
-        is MainViewState.Loading -> {
-            LoadingScreen(modifier)
-
-        }
-
-        is MainViewState.Loaded -> {
-            UserListScreen(state.users, modifier, onToggleFollowClick)
-
-        }
-
-        is MainViewState.Failed -> {
-            FailedScreen(state.error, modifier, onRetryClick)
-        }
-    }
-
-}
-
-@Composable
-fun LoadingScreen(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            CircularProgressIndicator()
-            Text(stringResource(R.string.loading),
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-}
-
-@Composable
-fun FailedScreen(errorMessage: String, modifier: Modifier = Modifier, onRetryClick: () -> Unit) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(text = stringResource(R.string.failed).format(errorMessage),
-                textAlign = TextAlign.Center,
-            )
-            Button(content = { Text(stringResource(R.string.retry)) },
-                onClick = onRetryClick)
-        }
-    }
-}
-
-@Composable
-fun UserListScreen(
-    users: List<User>,
-    modifier: Modifier = Modifier,
-    onToggleFollowClick: (Int) -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(users) { user ->
-                UserListItem(user, onToggleFollowClick)
-            }
-        }
-    }
-}
-
-@Composable
-fun UserListItem(user: User, onToggleFollowClick: (Int) -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Row(modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.requiredSize(64.dp)) {
-                ProfileImage(url = user.profileImage, // ProfileImage wraps an Image and swaps in a remote image if available
-                    contentDescription = user.name,
-                    modifier = Modifier
-                        .requiredSize(40.dp)
-                        .align(Alignment.Center))
-                if (user.followed) { // indicate that the user is followed with an icon
-                    Image(painter = painterResource(id = R.drawable.user_followed),
-                        contentDescription = stringResource(R.string.is_followed, user.name),
-                        modifier = Modifier
-                            .size(24.dp)
-                            .align(Alignment.TopEnd))
-                }
-            }
-            Column(modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = user.name,
-                    style = MaterialTheme.typography.titleLarge)
-                Text(text = stringResource(R.string.d_reputation).format(user.reputation),
-                    style = MaterialTheme.typography.labelSmall)
-            }
-            val followedText = if (user.followed) stringResource(R.string.unfollow) else stringResource(R.string.follow)
-            if (user.followed){
-                OutlinedButton(content = { Text(followedText) },
-                    onClick = { onToggleFollowClick(user.id) })
-            }else{
-                Button(content = { Text(followedText) },
-                    onClick = { onToggleFollowClick(user.id) })
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "User List Item Unfollowed")
-@Composable
-fun UserListItemPreviewFollowed() {
-    PixelTheme {
-        UserListItem (User(1, "Alice", 100, "https://", false), {})
-    }
-}
-
-@Preview(showBackground = true, name = "User List Item Followed")
-@Composable
-fun UserListItemPreviewUnfollowed() {
-    PixelTheme {
-        UserListItem (User(1, "Alice", 100, "https://", true), {})
-    }
-}
-
-@Preview(showBackground = true, name = "User List Item Edge Cases")
-@Composable
-fun UserListItemPreviewEdgeCases() {
-    PixelTheme {
-        UserListItem (User(1, "Alice with a very long surname", 1000000000, "https://", true), {})
-    }
-}
-
-@Preview(showBackground = true, name = "Loading State")
-@Composable
-fun UserListPreviewLoading() {
-    PixelTheme {
-        MainScreen(MainViewState.Loading)
-    }
-}
-
-@Preview(showBackground = true, name = "Loaded State")
-@Composable
-fun UserListPreviewLoaded() {
-    PixelTheme {
-        val previewUsers = listOf(
-            User(1, "Alice", 100, "https://", false),
-            User(2, "Bob", 200, "https://", true),
-            User(3, "Chad", 300, "https://", false),
-        )
-        MainScreen(MainViewState.Loaded(users = previewUsers))
-    }
-}
-
-@Preview(showBackground = true, name = "Failed State")
-@Composable
-fun UserListPreviewFailed() {
-    PixelTheme {
-        MainScreen(MainViewState.Failed("Preview Error: This is an error that uses two lines on a small screen device"))
     }
 }

@@ -1,4 +1,4 @@
-package com.biddulph.pixel.view
+package com.biddulph.pixel.ui.view
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
