@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import com.biddulph.pixel.R
+import com.biddulph.pixel.cache.ProfileImageCache
 import com.biddulph.pixel.request.ProfileImageDownloader
 
 @Composable
@@ -27,8 +28,18 @@ fun ProfileImage(url: String?,
     if (!LocalInspectionMode.current) {
         // use URL to download image
         LaunchedEffect(url) {
-            //TODO check cache
-            remoteBitmap = ProfileImageDownloader.downloadImage(url)
+            // check cache
+            if (url != null) {
+                // check cache
+                remoteBitmap = ProfileImageCache.get(url)
+                if (remoteBitmap == null) {
+                    // download new
+                    remoteBitmap = ProfileImageDownloader.downloadImage(url)
+                    remoteBitmap?.let { ProfileImageCache.put(url, it) }
+                }
+            }else{
+                remoteBitmap = null
+            }
         }
     }
 
