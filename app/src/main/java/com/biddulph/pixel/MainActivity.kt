@@ -21,6 +21,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -150,7 +152,7 @@ fun UserListScreen(
     modifier: Modifier = Modifier,
     onToggleFollowClick: (Int) -> Unit) {
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         LazyColumn(
@@ -191,15 +193,21 @@ fun UserListItem(user: User, onToggleFollowClick: (Int) -> Unit) {
             }
             Column(modifier = Modifier
                 .padding(horizontal = 16.dp)
-                .weight(1f)) {
+                .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(text = user.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp)
-                Text("${user.reputation}")
+                    style = MaterialTheme.typography.titleLarge)
+                Text(text = "%,d reputation".format(user.reputation),
+                    style = MaterialTheme.typography.labelSmall)
             }
             val followedText = if (user.followed) "Unfollow" else "Follow"
-            Button(content = { Text(followedText) },
-                onClick = { onToggleFollowClick(user.id) })
+            if (user.followed){
+                OutlinedButton(content = { Text(followedText) },
+                    onClick = { onToggleFollowClick(user.id) })
+            }else{
+                Button(content = { Text(followedText) },
+                    onClick = { onToggleFollowClick(user.id) })
+            }
         }
     }
 }

@@ -98,5 +98,9 @@ Simple state engine with 3 states: Loading, Loaded, Failed
 State holds the user list for the Loaded state and failure message for the Failed state. 
 Toggle follow/unfollow updates the view model data directly rather than re-querying as we're only using a local storage for the flag, not unreliable.
 
+**Style**
+
+Stackoverflow standard orange chosen with the grey used in their branding. Secondary colour of blue as used in Stack Exchange, but unused in the ui currently.
+Rest of colours left as material defaults.
 
 --------------------------------------
