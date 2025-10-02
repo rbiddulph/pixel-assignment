@@ -43,6 +43,7 @@ import com.biddulph.pixel.service.UserService
 import com.biddulph.pixel.service.UserServiceImpl
 import com.biddulph.pixel.storage.FollowerStorageImpl
 import com.biddulph.pixel.ui.theme.PixelTheme
+import com.biddulph.pixel.view.ProfileImage
 import com.biddulph.pixel.viewmodel.MainViewModel
 import com.biddulph.pixel.viewmodel.MainViewModelFactory
 import com.biddulph.pixel.viewmodel.MainViewState
@@ -178,7 +179,7 @@ fun UserListItem(user: User, onToggleFollowClick: (Int) -> Unit) {
             .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.requiredSize(64.dp)) {
-                Image(painter = painterResource(id = R.drawable.profile_placeholder),//TODO we want to download from user.profileImage
+                ProfileImage(url = user.profileImage, // ProfileImage wraps an Image and swaps in a remote image if available
                     contentDescription = user.name,
                     modifier = Modifier
                         .requiredSize(40.dp)
