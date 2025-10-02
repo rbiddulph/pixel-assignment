@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Pixel</string>
+    <string name="follow">Follow</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="d_reputation">%,d reputation</string>
+    <string name="is_followed">%1$s is followed</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading…</string>
+    <string name="failed">Loading failed: %1$s</string>
 </resources>

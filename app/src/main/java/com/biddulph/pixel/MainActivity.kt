@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -120,7 +121,7 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             CircularProgressIndicator()
-            Text("Loading...",
+            Text(stringResource(R.string.loading),
                 textAlign = TextAlign.Center,
             )
         }
@@ -138,10 +139,10 @@ fun FailedScreen(errorMessage: String, modifier: Modifier = Modifier, onRetryCli
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = errorMessage,
+            Text(text = stringResource(R.string.failed).format(errorMessage),
                 textAlign = TextAlign.Center,
             )
-            Button(content = { Text("Retry") },
+            Button(content = { Text(stringResource(R.string.retry)) },
                 onClick = onRetryClick)
         }
     }
@@ -186,7 +187,7 @@ fun UserListItem(user: User, onToggleFollowClick: (Int) -> Unit) {
                         .align(Alignment.Center))
                 if (user.followed) { // indicate that the user is followed with an icon
                     Image(painter = painterResource(id = R.drawable.user_followed),
-                        contentDescription = "${user.name} is followed",
+                        contentDescription = stringResource(R.string.is_followed, user.name),
                         modifier = Modifier
                             .size(24.dp)
                             .align(Alignment.TopEnd))
@@ -198,10 +199,10 @@ fun UserListItem(user: User, onToggleFollowClick: (Int) -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(text = user.name,
                     style = MaterialTheme.typography.titleLarge)
-                Text(text = "%,d reputation".format(user.reputation),
+                Text(text = stringResource(R.string.d_reputation).format(user.reputation),
                     style = MaterialTheme.typography.labelSmall)
             }
-            val followedText = if (user.followed) "Unfollow" else "Follow"
+            val followedText = if (user.followed) stringResource(R.string.unfollow) else stringResource(R.string.follow)
             if (user.followed){
                 OutlinedButton(content = { Text(followedText) },
                     onClick = { onToggleFollowClick(user.id) })
