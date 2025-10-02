@@ -9,13 +9,13 @@ Android Studio Narwhal 4 Feature Drop | 2025.1.4 RC 1
 
 Gradle 8.12.3
 
-Android 36 SDK
+Android 36 SDK (minimum of SDK 29 - Android 10 (~88% of market))
 
 
 Functionality
 -------------
 
-The app uses a service to combine user data from 2 sources - remote StackOverlow API and local storage
+The app uses a service to combine user data from 2 sources - remote StackOverflow API and local storage
 
 This service is fed into MainViewModel which services the Compose UI view and handles state.
 
@@ -23,7 +23,7 @@ The Compose UI has different states based on availability of data.
 
 Users can tap a button to follow/unfollow a user in the UI - this changes the local storage state for that user.
 
-Profile images are downloaded from remote server and cached
+Profile images are downloaded from remote server and cached in memory for that session (url as key)
 
 Tests
 -----
@@ -60,6 +60,10 @@ MainViewModelTest
 
 Technical Decisions
 -------------------
+
+**Architecture**
+
+MVVM - dumb UI, logic in view model.
 
 **User Obj**
 
@@ -105,4 +109,6 @@ Toggle follow/unfollow updates the view model data directly rather than re-query
 Stackoverflow standard orange chosen with the grey used in their branding. Secondary colour of blue as used in Stack Exchange, but unused in the ui currently.
 Rest of colours left as material defaults.
 
---------------------------------------
+**Screens**
+
+MainActivity was getting a little busy, so moved screens out into their own class files.  
