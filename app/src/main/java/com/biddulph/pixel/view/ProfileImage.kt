@@ -28,7 +28,6 @@ fun ProfileImage(url: String?,
     if (!LocalInspectionMode.current) {
         // use URL to download image
         LaunchedEffect(url) {
-            // check cache
             if (url != null) {
                 // check cache
                 remoteBitmap = ProfileImageCache.get(url)

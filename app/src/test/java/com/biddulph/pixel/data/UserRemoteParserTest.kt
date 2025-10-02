@@ -1,7 +1,6 @@
 package com.biddulph.pixel.data
 
 import com.biddulph.pixel.parser.UserJsonParser
-import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull

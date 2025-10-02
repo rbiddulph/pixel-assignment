@@ -2,7 +2,6 @@ package com.biddulph.pixel.request
 
 import com.biddulph.pixel.data.UserRemoteResponse
 import com.biddulph.pixel.parser.UserJsonParser
-import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 

@@ -2,7 +2,7 @@ package com.biddulph.pixel.storage
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import junit.framework.Assert.assertEquals
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
