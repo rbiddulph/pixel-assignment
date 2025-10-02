@@ -2,6 +2,7 @@ package com.biddulph.pixel.view
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -9,9 +10,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.biddulph.pixel.R
 import com.biddulph.pixel.cache.ProfileImageCache
 import com.biddulph.pixel.request.ProfileImageDownloader
@@ -46,7 +49,7 @@ fun ProfileImage(url: String?,
     remoteBitmap?.let { bitmap ->
         Image(bitmap = bitmap.asImageBitmap(),
             contentDescription = contentDescription,
-            modifier = modifier)
+            modifier = modifier.clip(RoundedCornerShape(8.dp)))
     } ?: Image(painter = painterResource(id = R.drawable.profile_placeholder),
         contentDescription = contentDescription,
         modifier = modifier)
